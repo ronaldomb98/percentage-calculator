@@ -19,6 +19,15 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      transition: align-items 0.3s;
+    }
+
+    body.align-top {
+      align-items: flex-start;
+    }
+
+    body.align-bottom {
+      align-items: flex-end;
     }
 
     .container {
@@ -68,6 +77,12 @@
 
     .input-wrapper input[type="number"]:focus {
       border-color: #4f46e5;
+    }
+
+    .input-wrapper input[readonly] {
+      background: #fafafa;
+      cursor: default;
+      caret-color: transparent;
     }
 
     .clear-btn {
@@ -120,6 +135,89 @@
       font-size: 1.2rem;
       font-weight: 700;
       color: #4f46e5;
+    }
+
+    /* ---- TECLADO NUMÉRICO ---- */
+    .numpad-wrapper {
+      margin-top: 20px;
+      background: #ede9fe;
+      border-radius: 14px;
+      padding: 12px;
+      display: none;
+    }
+
+    .numpad-wrapper.visible {
+      display: block;
+    }
+
+    .numpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .numpad-key {
+      background: white;
+      border: 2px solid #e0e7ff;
+      border-radius: 10px;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #1a1a2e;
+      padding: 18px 10px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 0 #c4b5fd;
+      transition: background 0.1s, transform 0.1s, box-shadow 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .numpad-key:active {
+      background: #f5f3ff;
+      transform: scale(0.96);
+      box-shadow: none;
+    }
+
+    .numpad-key.key-comma {
+      background: #f5f3ff;
+      color: #4f46e5;
+      font-weight: 700;
+      border-color: #c4b5fd;
+      box-shadow: 0 2px 0 #a78bfa;
+    }
+
+    .numpad-key.key-comma:active {
+      background: #ede9fe;
+      box-shadow: none;
+    }
+
+    .numpad-key.key-delete {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+      font-size: 1.3rem;
+      box-shadow: 0 2px 0 #f87171;
+    }
+
+    .numpad-key.key-delete:active {
+      background: #fca5a5;
+      box-shadow: none;
+    }
+
+    .numpad-key.key-clear {
+      grid-column: span 3;
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 10px;
+      box-shadow: 0 2px 0 #f87171;
+    }
+
+    .numpad-key.key-clear:active {
+      background: #fca5a5;
+      box-shadow: none;
     }
 
     /* ---- BOTÓN ACORDEÓN ---- */
@@ -231,7 +329,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 0;
     }
 
     .toggle-row span {
@@ -285,11 +383,52 @@
 
     .commission-fields {
       transition: opacity 0.2s;
+      margin-top: 14px;
     }
 
     .commission-fields.disabled {
       opacity: 0.4;
       pointer-events: none;
+    }
+
+    /* ---- ALINEACIÓN ---- */
+    .align-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .align-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #e0e7ff;
+      background: white;
+      color: #6b7280;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .align-btn .align-icon {
+      font-size: 1.1rem;
+    }
+
+    .align-btn:hover {
+      border-color: #4f46e5;
+      color: #4f46e5;
+      background: #f5f3ff;
+    }
+
+    .align-btn.active {
+      border-color: #4f46e5;
+      background: #4f46e5;
+      color: white;
     }
 
     /* ---- PORCENTAJES ---- */
@@ -399,10 +538,15 @@
       h1 {
         font-size: 1.2rem;
       }
+
+      .numpad-key {
+        font-size: 1.3rem;
+        padding: 15px 10px;
+      }
     }
   </style>
 </head>
-<body>
+<body id="appBody">
 
 <div class="container">
   <h1>🧮 Calculadora de Porcentajes</h1>
@@ -423,7 +567,27 @@
     </div>
   </div>
 
+  <!-- Resultados -->
   <div class="results" id="results"></div>
+
+  <!-- Teclado numérico -->
+  <div class="numpad-wrapper" id="numpadWrapper">
+    <div class="numpad-grid">
+      <button class="numpad-key" onclick="numpadPress('7')">7</button>
+      <button class="numpad-key" onclick="numpadPress('8')">8</button>
+      <button class="numpad-key" onclick="numpadPress('9')">9</button>
+      <button class="numpad-key" onclick="numpadPress('4')">4</button>
+      <button class="numpad-key" onclick="numpadPress('5')">5</button>
+      <button class="numpad-key" onclick="numpadPress('6')">6</button>
+      <button class="numpad-key" onclick="numpadPress('1')">1</button>
+      <button class="numpad-key" onclick="numpadPress('2')">2</button>
+      <button class="numpad-key" onclick="numpadPress('3')">3</button>
+      <button class="numpad-key key-delete" onclick="numpadDelete()">⌫</button>
+      <button class="numpad-key key-zero"   onclick="numpadPress('0')">0</button>
+      <button class="numpad-key key-comma"  onclick="numpadPress('.')">.</button>
+      <button class="numpad-key key-clear"  onclick="clearInput()">✕ Limpiar todo</button>
+    </div>
+  </div>
 
   <!-- Acordeón configuración -->
   <div class="config-toggle">
@@ -433,6 +597,37 @@
     </button>
 
     <div class="config-panel" id="configPanel">
+
+      <!-- Sección: alineación -->
+      <div class="config-section">
+        <h2>↕️ Posición del contenido</h2>
+        <div class="align-selector">
+          <button class="align-btn" id="alignTop" onclick="setAlignment('top')">
+            <span class="align-icon">⬆️</span>
+            <span>Arriba</span>
+          </button>
+          <button class="align-btn" id="alignCenter" onclick="setAlignment('center')">
+            <span class="align-icon">⬛</span>
+            <span>Centro</span>
+          </button>
+          <button class="align-btn" id="alignBottom" onclick="setAlignment('bottom')">
+            <span class="align-icon">⬇️</span>
+            <span>Abajo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sección: teclado en pantalla -->
+      <div class="config-section">
+        <h2>⌨️ Modo de entrada</h2>
+        <div class="toggle-row">
+          <span>Usar teclado en pantalla</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleNumpadConfig" onchange="onToggleNumpadConfig()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
 
       <!-- Sección: comisión fija -->
       <div class="config-section">
@@ -477,19 +672,95 @@
   const DEFAULT_PERCENTAGES     = [10, 35];
   const DEFAULT_COMMISSION      = 1.3;
   const DEFAULT_SHOW_COMMISSION = true;
+  const DEFAULT_USE_NUMPAD      = false;
+  const DEFAULT_ALIGNMENT       = 'center';
   const STORAGE_KEY             = 'calc_percentages';
   const STORAGE_COMMISSION_KEY  = 'calc_commission';
   const STORAGE_SHOW_KEY        = 'calc_show_commission';
+  const STORAGE_NUMPAD_KEY      = 'calc_use_numpad';
+  const STORAGE_ALIGN_KEY       = 'calc_alignment';
+
+  // ── Alineación ────────────────────────────────────────────
+  function loadAlignment() {
+    return localStorage.getItem(STORAGE_ALIGN_KEY) || DEFAULT_ALIGNMENT;
+  }
+
+  function applyAlignment(value) {
+    const body = document.getElementById('appBody');
+    body.classList.remove('align-top', 'align-bottom');
+    if (value === 'top')    body.classList.add('align-top');
+    if (value === 'bottom') body.classList.add('align-bottom');
+
+    // Actualizar botones activos
+    ['top', 'center', 'bottom'].forEach(v => {
+      const btn = document.getElementById('align' + v.charAt(0).toUpperCase() + v.slice(1));
+      if (btn) btn.classList.toggle('active', v === value);
+    });
+  }
+
+  function setAlignment(value) {
+    localStorage.setItem(STORAGE_ALIGN_KEY, value);
+    applyAlignment(value);
+    showSaveMsg();
+  }
+
+  // ── Teclado en pantalla ───────────────────────────────────
+  function loadUseNumpad() {
+    const stored = localStorage.getItem(STORAGE_NUMPAD_KEY);
+    return stored !== null ? stored === 'true' : DEFAULT_USE_NUMPAD;
+  }
+
+  function applyNumpadState(active) {
+    const input   = document.getElementById('inputValue');
+    const wrapper = document.getElementById('numpadWrapper');
+    document.getElementById('toggleNumpadConfig').checked = active;
+    if (active) {
+      input.setAttribute('readonly', true);
+      input.setAttribute('inputmode', 'none');
+      wrapper.classList.add('visible');
+    } else {
+      input.removeAttribute('readonly');
+      input.setAttribute('inputmode', 'numeric');
+      wrapper.classList.remove('visible');
+    }
+  }
+
+  function onToggleNumpadConfig() {
+    const active = document.getElementById('toggleNumpadConfig').checked;
+    localStorage.setItem(STORAGE_NUMPAD_KEY, active);
+    applyNumpadState(active);
+    autoSave();
+  }
+
+  // ── Teclado: pulsación ────────────────────────────────────
+  function numpadPress(key) {
+    const input   = document.getElementById('inputValue');
+    let current   = input.value;
+    if (key === '.') {
+      if (current.includes('.')) return;
+      input.value = current === '' ? '0.' : current + '.';
+    } else {
+      input.value = (current === '0') ? key : current + key;
+    }
+    calculate();
+  }
+
+  // ── Teclado: borrar último dígito ─────────────────────────
+  function numpadDelete() {
+    const input = document.getElementById('inputValue');
+    input.value = input.value.slice(0, -1);
+    calculate();
+  }
 
   // ── Limpiar campo valor base ──────────────────────────────
   function clearInput() {
     const input = document.getElementById('inputValue');
     input.value = '';
-    input.focus();
+    if (!loadUseNumpad()) input.focus();
     calculate();
   }
 
-  // ── Cargar porcentajes ────────────────────────────────────
+  // ── Porcentajes ───────────────────────────────────────────
   function loadPercentages() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -501,23 +772,20 @@
     return [...DEFAULT_PERCENTAGES];
   }
 
-  // ── Cargar comisión ───────────────────────────────────────
+  // ── Comisión ──────────────────────────────────────────────
   function loadCommission() {
     const stored = localStorage.getItem(STORAGE_COMMISSION_KEY);
     if (stored !== null && !isNaN(parseFloat(stored))) return parseFloat(stored);
     return DEFAULT_COMMISSION;
   }
 
-  // ── Cargar visibilidad comisión ───────────────────────────
   function loadShowCommission() {
     const stored = localStorage.getItem(STORAGE_SHOW_KEY);
-    if (stored !== null) return stored === 'true';
-    return DEFAULT_SHOW_COMMISSION;
+    return stored !== null ? stored === 'true' : DEFAULT_SHOW_COMMISSION;
   }
 
   // ── Guardar automáticamente ───────────────────────────────
   function autoSave() {
-    // Porcentajes
     const list = document.getElementById('percentageList');
     const inputs = list.querySelectorAll('input[type="number"]');
     const values = [];
@@ -527,11 +795,8 @@
     });
     if (values.length > 0) localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
 
-    // Comisión
     const comRaw = parseFloat(document.getElementById('configCommission').value);
     localStorage.setItem(STORAGE_COMMISSION_KEY, isNaN(comRaw) ? DEFAULT_COMMISSION : comRaw);
-
-    // Visibilidad
     localStorage.setItem(STORAGE_SHOW_KEY, document.getElementById('toggleCommission').checked);
 
     showSaveMsg();
@@ -554,17 +819,14 @@
     autoSave();
   }
 
-  // ── Calcular resultados ───────────────────────────────────
+  // ── Calcular ──────────────────────────────────────────────
   function calculate() {
     const rawVal = document.getElementById('inputValue').value;
     const val = (rawVal === '' || isNaN(parseFloat(rawVal))) ? 0 : parseFloat(rawVal);
-
     const showCommission = loadShowCommission();
     const commission = showCommission ? loadCommission() : 0;
-
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
-
     loadPercentages().forEach(p => {
       const result = val + val * (p / 100) + commission;
       const card = document.createElement('div');
@@ -577,27 +839,21 @@
     });
   }
 
-  // ── Formatear número ──────────────────────────────────────
   function formatNumber(num) {
     return num.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  // ── Abrir/cerrar acordeón ─────────────────────────────────
+  // ── Acordeón ──────────────────────────────────────────────
   function toggleConfig() {
     const panel  = document.getElementById('configPanel');
     const btn    = document.getElementById('configToggleBtn');
     const isOpen = panel.classList.contains('open');
-
     if (!isOpen) {
       renderConfigList();
-      // Quitar foco de cualquier input activo (cierra el teclado en móvil)
       if (document.activeElement) document.activeElement.blur();
     }
-
     panel.classList.toggle('open');
     btn.classList.toggle('open');
-
-    // Mover foco al panel al abrirse
     if (!isOpen) {
       setTimeout(() => {
         panel.setAttribute('tabindex', '-1');
@@ -606,7 +862,7 @@
     }
   }
 
-  // ── Renderizar lista de porcentajes ───────────────────────
+  // ── Renderizar config ─────────────────────────────────────
   function renderConfigList() {
     const list = document.getElementById('percentageList');
     const percentages = loadPercentages();
@@ -618,9 +874,13 @@
     const show = loadShowCommission();
     document.getElementById('toggleCommission').checked = show;
     document.getElementById('commissionFields').classList.toggle('disabled', !show);
+    document.getElementById('toggleNumpadConfig').checked = loadUseNumpad();
+
+    // Marcar botón de alineación activo
+    applyAlignment(loadAlignment());
   }
 
-  // ── Crear ítem de porcentaje ──────────────────────────────
+  // ── Ítem porcentaje ───────────────────────────────────────
   function makePercentageItem(value, index) {
     const item = document.createElement('div');
     item.className = 'percentage-item';
@@ -632,7 +892,6 @@
     return item;
   }
 
-  // ── Mostrar/ocultar botones "Quitar" según cantidad ───────
   function updateRemoveButtons() {
     const list = document.getElementById('percentageList');
     const items = list.querySelectorAll('.percentage-item');
@@ -642,17 +901,14 @@
     });
   }
 
-  // ── Agregar porcentaje ────────────────────────────────────
   function addPercentage() {
     const list = document.getElementById('percentageList');
-    const index = list.children.length;
-    list.appendChild(makePercentageItem(0, index));
+    list.appendChild(makePercentageItem(0, list.children.length));
     refreshIds();
     updateRemoveButtons();
     autoSave();
   }
 
-  // ── Eliminar porcentaje ───────────────────────────────────
   function removePercentage(index) {
     const list = document.getElementById('percentageList');
     if (list.children.length <= 1) return;
@@ -662,7 +918,6 @@
     autoSave();
   }
 
-  // ── Re-asignar IDs ────────────────────────────────────────
   function refreshIds() {
     const list = document.getElementById('percentageList');
     Array.from(list.children).forEach((item, i) => {
@@ -676,13 +931,21 @@
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_COMMISSION_KEY);
     localStorage.removeItem(STORAGE_SHOW_KEY);
+    localStorage.removeItem(STORAGE_NUMPAD_KEY);
+    localStorage.removeItem(STORAGE_ALIGN_KEY);
+    applyNumpadState(DEFAULT_USE_NUMPAD);
+    applyAlignment(DEFAULT_ALIGNMENT);
     renderConfigList();
     calculate();
     showSaveMsg();
   }
 
   // ── Inicializar ───────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => calculate());
+  document.addEventListener('DOMContentLoaded', () => {
+    applyAlignment(loadAlignment());
+    applyNumpadState(loadUseNumpad());
+    calculate();
+  });
 </script>
 
 </body>
