@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Calculadora de Porcentajes</title>
   <style>
     * {
@@ -733,7 +733,8 @@
 
   // ── Sanitizar entrada libre (sin numpad) ─────────────────
   function sanitizeNumericInput(input) {
-    let val = input.value.replace(/[^0-9.]/g, '');
+    // iOS en locale español inserta coma como separador decimal → normalizamos a punto
+    let val = input.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
     const dotIndex = val.indexOf('.');
     if (dotIndex !== -1) {
       val = val.slice(0, dotIndex + 1) + val.slice(dotIndex + 1).replace(/\./g, '');
