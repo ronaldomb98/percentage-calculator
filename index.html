@@ -65,7 +65,7 @@
       align-items: center;
     }
 
-    .input-wrapper input[type="number"] {
+    .input-wrapper input[type="text"] {
       width: 100%;
       padding: 12px 48px 12px 16px;
       font-size: 1.2rem;
@@ -75,7 +75,7 @@
       transition: border 0.2s;
     }
 
-    .input-wrapper input[type="number"]:focus {
+    .input-wrapper input[type="text"]:focus {
       border-color: #4f46e5;
     }
 
@@ -556,12 +556,11 @@
     <label for="inputValue">Valor base</label>
     <div class="input-wrapper">
       <input
-        type="number"
+        type="text"
         id="inputValue"
-        inputmode="numeric"
+        inputmode="decimal"
         placeholder="0"
-        min="0"
-        oninput="calculate()"
+        oninput="sanitizeNumericInput(this)"
       />
       <button class="clear-btn" onclick="clearInput()" title="Limpiar valor">✕</button>
     </div>
@@ -720,7 +719,7 @@
       wrapper.classList.add('visible');
     } else {
       input.removeAttribute('readonly');
-      input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('inputmode', 'decimal');
       wrapper.classList.remove('visible');
     }
   }
@@ -730,6 +729,17 @@
     localStorage.setItem(STORAGE_NUMPAD_KEY, active);
     applyNumpadState(active);
     autoSave();
+  }
+
+  // ── Sanitizar entrada libre (sin numpad) ─────────────────
+  function sanitizeNumericInput(input) {
+    let val = input.value.replace(/[^0-9.]/g, '');
+    const dotIndex = val.indexOf('.');
+    if (dotIndex !== -1) {
+      val = val.slice(0, dotIndex + 1) + val.slice(dotIndex + 1).replace(/\./g, '');
+    }
+    if (input.value !== val) input.value = val;
+    calculate();
   }
 
   // ── Teclado: pulsación ────────────────────────────────────
