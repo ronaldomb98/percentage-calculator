@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Porcentajes</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    /* ---- INPUT CON BOTÓN LIMPIAR ---- */
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input[type="number"] {
+      width: 100%;
+      padding: 12px 48px 12px 16px;
+      font-size: 1.2rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .input-wrapper input[type="number"]:focus {
+      border-color: #4f46e5;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 10px;
+      background: #e5e7eb;
+      border: none;
+      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #6b7280;
+      transition: background 0.2s, color 0.2s;
+      line-height: 1;
+    }
+
+    .clear-btn:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    .results {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .result-card {
+      background: #f5f3ff;
+      border-left: 4px solid #4f46e5;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-card .label {
+      font-size: 0.95rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .result-card .value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #4f46e5;
+    }
+
+    .result-card.commission {
+      background: #fff7ed;
+      border-left-color: #f97316;
+    }
+
+    .result-card.commission .value {
+      color: #f97316;
+    }
+
+    /* ---- MENÚ DE CONFIGURACIÓN ---- */
+    .config-toggle {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .config-toggle button {
+      background: none;
+      border: 2px solid #4f46e5;
+      color: #4f46e5;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .config-toggle button:hover {
+      background: #4f46e5;
+      color: white;
+    }
+
+    .config-panel {
+      display: none;
+      margin-top: 20px;
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .config-panel.open {
+      display: block;
+    }
+
+    .config-panel h2 {
+      font-size: 1rem;
+      color: #333;
+      margin-bottom: 14px;
+    }
+
+    .config-section {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .config-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .config-section label {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .config-section input[type="number"] {
+      font-size: 1rem;
+      padding: 9px 12px;
+    }
+
+    .input-hint {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    /* ---- TOGGLE SWITCH ---- */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .toggle-row span {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #ccc;
+      border-radius: 26px;
+      transition: background 0.2s;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .switch input:checked + .slider {
+      background: #4f46e5;
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    .commission-fields {
+      transition: opacity 0.2s;
+    }
+
+    .commission-fields.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ---- PORCENTAJES ---- */
+    .percentage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .percentage-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .percentage-item input[type="number"] {
+      width: 90px;
+      padding: 8px 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+    }
+
+    .percentage-item span {
+      font-size: 1rem;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .percentage-item button.remove-btn {
+      background: #fee2e2;
+      border: none;
+      color: #dc2626;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .percentage-item button.remove-btn:hover {
+      background: #fca5a5;
+    }
+
+    .config-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .config-actions button {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-add {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .btn-add:hover {
+      background: #a7f3d0;
+    }
+
+    .btn-save {
+      background: #4f46e5;
+      color: white;
+    }
+
+    .btn-save:hover {
+      background: #4338ca;
+    }
+
+    .btn-reset {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .btn-reset:hover {
+      background: #e5e7eb;
+    }
+
+    .save-msg {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #059669;
+      font-weight: 600;
+      display: none;
+    }
+
+    @media (max-width: 400px) {
+      .container {
+        padding: 22px 16px;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🧮 Calculadora de Porcentajes</h1>
+  <p class="subtitle">Los resultados se actualizan automáticamente</p>
+
+  <!-- Campo valor base con botón limpiar -->
+  <div class="input-group">
+    <label for="inputValue">Valor base</label>
+    <div class="input-wrapper">
+      <input
+        type="number"
+        id="inputValue"
+        placeholder="0"
+        min="0"
+        oninput="calculate()"
+      />
+      <button class="clear-btn" onclick="clearInput()" title="Limpiar valor">✕</button>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <!-- Botón para abrir configuración -->
+  <div class="config-toggle">
+    <button onclick="toggleConfig()">⚙️ Configurar porcentajes</button>
+  </div>
+
+  <!-- Panel de configuración -->
+  <div class="config-panel" id="configPanel">
+
+    <!-- Sección: comisión fija -->
+    <div class="config-section">
+      <h2>💰 Comisión fija</h2>
+      <div class="toggle-row">
+        <span>Mostrar comisión en resultados</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleCommission" onchange="onToggleCommission()" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="commission-fields" id="commissionFields">
+        <label for="configCommission">Valor de comisión</label>
+        <input
+          type="number"
+          id="configCommission"
+          min="0"
+          placeholder="2"
+        />
+        <p class="input-hint">Se suma al total de cada resultado</p>
+      </div>
+    </div>
+
+    <!-- Sección: porcentajes -->
+    <div class="config-section">
+      <h2>📊 Porcentajes a calcular</h2>
+      <div class="percentage-list" id="percentageList"></div>
+      <div class="config-actions">
+        <button class="btn-add" onclick="addPercentage()">+ Agregar</button>
+        <button class="btn-save" onclick="saveConfig()">💾 Guardar</button>
+        <button class="btn-reset" onclick="resetConfig()">↺ Restablecer</button>
+      </div>
+    </div>
+
+    <p class="save-msg" id="saveMsg">✅ Configuración guardada</p>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_PERCENTAGES = [10, 35];
+  const DEFAULT_COMMISSION = 2;
+  const DEFAULT_SHOW_COMMISSION = true;
+  const STORAGE_KEY = 'calc_percentages';
+  const STORAGE_COMMISSION_KEY = 'calc_commission';
+  const STORAGE_SHOW_COMMISSION_KEY = 'calc_show_commission';
+
+  // ── Limpiar campo valor base ────────────────────────────────
+  function clearInput() {
+    const input = document.getElementById('inputValue');
+    input.value = '';
+    input.focus();
+    calculate();
+  }
+
+  // ── Cargar porcentajes ──────────────────────────────────────
+  function loadPercentages() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return [...DEFAULT_PERCENTAGES];
+  }
+
+  // ── Cargar comisión guardada ────────────────────────────────
+  function loadCommission() {
+    const stored = localStorage.getItem(STORAGE_COMMISSION_KEY);
+    if (stored !== null && !isNaN(parseFloat(stored))) {
+      return parseFloat(stored);
+    }
+    return DEFAULT_COMMISSION;
+  }
+
+  // ── Cargar preferencia de visibilidad de comisión ───────────
+  function loadShowCommission() {
+    const stored = localStorage.getItem(STORAGE_SHOW_COMMISSION_KEY);
+    if (stored !== null) return stored === 'true';
+    return DEFAULT_SHOW_COMMISSION;
+  }
+
+  // ── Reaccionar al cambio del toggle ────────────────────────
+  function onToggleCommission() {
+    const checked = document.getElementById('toggleCommission').checked;
+    document.getElementById('commissionFields').classList.toggle('disabled', !checked);
+  }
+
+  // ── Calcular y mostrar resultados ───────────────────────────
+  function calculate() {
+    const rawVal = document.getElementById('inputValue').value;
+    const val = (rawVal === '' || isNaN(parseFloat(rawVal))) ? 0 : parseFloat(rawVal);
+
+    const showCommission = loadShowCommission();
+    const commission = showCommission ? loadCommission() : 0;
+
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    // Card de comisión fija (solo si está habilitada)
+    if (showCommission) {
+      const commCard = document.createElement('div');
+      commCard.className = 'result-card commission';
+      commCard.innerHTML = `
+        <span class="label">💰 Comisión fija</span>
+        <span class="value">${formatNumber(commission)}</span>
+      `;
+      resultsDiv.appendChild(commCard);
+    }
+
+    // Cards: valor base + % + comisión
+    const percentages = loadPercentages();
+    percentages.forEach(p => {
+      const result = val + val * (p / 100) + commission;
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <span class="label">Valor + ${p}%${showCommission ? ' + comisión' : ''}</span>
+        <span class="value">${formatNumber(result)}</span>
+      `;
+      resultsDiv.appendChild(card);
+    });
+  }
+
+  // ── Formatear número ────────────────────────────────────────
+  function formatNumber(num) {
+    return num.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // ── Mostrar/ocultar panel de configuración ──────────────────
+  function toggleConfig() {
+    const panel = document.getElementById('configPanel');
+    const isOpen = panel.classList.contains('open');
+    if (!isOpen) renderConfigList();
+    panel.classList.toggle('open');
+  }
+
+  // ── Renderizar lista en el panel ────────────────────────────
+  function renderConfigList() {
+    const list = document.getElementById('percentageList');
+    const percentages = loadPercentages();
+    list.innerHTML = '';
+
+    percentages.forEach((p, i) => {
+      const item = document.createElement('div');
+      item.className = 'percentage-item';
+      item.innerHTML = `
+        <input type="number" id="pct_${i}" value="${p}" min="0" max="10000" />
+        <span>%</span>
+        <button class="remove-btn" onclick="removePercentage(${i})">✕ Quitar</button>
+      `;
+      list.appendChild(item);
+    });
+
+    document.getElementById('configCommission').value = loadCommission();
+    const showCommission = loadShowCommission();
+    document.getElementById('toggleCommission').checked = showCommission;
+    document.getElementById('commissionFields').classList.toggle('disabled', !showCommission);
+  }
+
+  // ── Agregar nuevo porcentaje ────────────────────────────────
+  function addPercentage() {
+    const list = document.getElementById('percentageList');
+    const count = list.children.length;
+    const item = document.createElement('div');
+    item.className = 'percentage-item';
+    item.innerHTML = `
+      <input type="number" id="pct_${count}" value="0" min="0" max="10000" />
+      <span>%</span>
+      <button class="remove-btn" onclick="removePercentage(${count})">✕ Quitar</button>
+    `;
+    list.appendChild(item);
+    refreshIds();
+  }
+
+  // ── Eliminar porcentaje ─────────────────────────────────────
+  function removePercentage(index) {
+    const list = document.getElementById('percentageList');
+    if (list.children.length <= 1) {
+      alert('Debe haber al menos un porcentaje.');
+      return;
+    }
+    list.children[index].remove();
+    refreshIds();
+  }
+
+  // ── Re-asignar IDs tras agregar/eliminar ────────────────────
+  function refreshIds() {
+    const list = document.getElementById('percentageList');
+    Array.from(list.children).forEach((item, i) => {
+      const input = item.querySelector('input');
+      const btn = item.querySelector('button');
+      input.id = `pct_${i}`;
+      btn.setAttribute('onclick', `removePercentage(${i})`);
+    });
+  }
+
+  // ── Guardar configuración en localStorage ───────────────────
+  function saveConfig() {
+    const list = document.getElementById('percentageList');
+    const inputs = list.querySelectorAll('input[type="number"]');
+    const values = [];
+    inputs.forEach(input => {
+      const v = parseFloat(input.value);
+      if (!isNaN(v) && v >= 0) values.push(v);
+    });
+
+    if (values.length === 0) {
+      alert('Agrega al menos un porcentaje válido.');
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+
+    const comInput = parseFloat(document.getElementById('configCommission').value);
+    const commission = isNaN(comInput) ? DEFAULT_COMMISSION : comInput;
+    localStorage.setItem(STORAGE_COMMISSION_KEY, commission);
+
+    const showCommission = document.getElementById('toggleCommission').checked;
+    localStorage.setItem(STORAGE_SHOW_COMMISSION_KEY, showCommission);
+
+    const msg = document.getElementById('saveMsg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+
+    calculate();
+  }
+
+  // ── Restablecer valores por defecto ─────────────────────────
+  function resetConfig() {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_COMMISSION_KEY);
+    localStorage.removeItem(STORAGE_SHOW_COMMISSION_KEY);
+    renderConfigList();
+    calculate();
+  }
+
+  // ── Inicializar al cargar la página ─────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    calculate();
+  });
+</script>
+
+</body>
+</html>
