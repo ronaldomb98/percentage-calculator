@@ -896,7 +896,7 @@
     const item = document.createElement('div');
     item.className = 'percentage-item';
     item.innerHTML = `
-      <input type="number" inputmode="numeric" id="pct_${index}" value="${value}" min="0" max="10000" oninput="autoSave()" />
+      <input type="number" inputmode="decimal" id="pct_${index}" value="${value}" min="0" max="10000" oninput="autoSave()" />
       <span>%</span>
       <button class="remove-btn" onclick="removePercentage(${index})">✕ Quitar</button>
     `;
